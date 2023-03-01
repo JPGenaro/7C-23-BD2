@@ -1,0 +1,42 @@
+drop database if exists GYM;
+create database GYM;
+use GYM;
+
+drop table if exists Sedes;
+drop table if exists Clases
+drop table if exists Socios;
+drop table if exists Reservas;
+drop table if exists Planes;
+drop table if exists Sesiones;
+drop table if exists Circuitos;
+drop table if exists Registros;
+drop table if exists Asistencias;
+
+create table Sedes(id int primary key, nombre varchar(30), direcion varchar(30), telefono int);
+
+create table Clases(id int primary key, nombre varchar(30), horario datetime, fecha datetime, cupo int, max_cupo int, id_sede int, constraint id_sede foreign key(id_sede) references Sedes(id));
+
+create table Socios(id int primary key, nombre varchar(30), apellido varchar(30), documento int, fecha_nacimiento datetime, fecha_registro datetime);
+
+create table Reservas(id int primary key, fecha datetime, asistio bool, id_socio int, constraint id_socio foreign key(id_socio) references Socios(id), id_clase int, constraint id_clase foreign key(id_clase) references Clases(id));
+
+create table Planes(id int primary key, tipo varchar(30), fecha_inicio datetime, fecha_fin datetime, duracion_estimada datetime, estado varchar(30), socio_id int, constraint socio_id foreign key(socio_id) references Socios(id));
+
+create table Sesiones(id int primary key, nombre varchar(30), id_plan int, constraint id_plan foreign key(id_plan) references Planes(id));
+
+create table Circuitos(id int primary key, ejercicios varchar(200), repeticiones int, series int, notas varchar(200), id_sesiones int, constraint id_sesiones foreign key(id_sesiones) references Sesiones(id));
+
+create table Registros(id int primary key, fecha_registro datetime, peso_utilizado int, repeticiones_realizadas int, series_realizadas int, notas_adicionales varchar(200), id_circuito int, constraint id_circuito foreign key(id_circuito) references Circuitos(id));
+
+create table Asistencias(id int primary key, fecha datetime, plan_id int, constraint plan_id foreign key (plan_id) references Planes(id), clases_id int, constraint clases_id foreign key(clases_id) references Clases(id));
+
+
+
+
+
+
+
+
+
+
+
