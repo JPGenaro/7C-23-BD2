@@ -1,0 +1,53 @@
+use Sakila;
+
+#1
+SELECT title, special_features
+FROM film
+WHERE rating = 'PG-13';
+
+#2
+SELECT DISTINCT length
+FROM film;
+
+#3
+SELECT title, rental_rate, replacement_cost
+FROM film
+WHERE replacement_cost IS NOT NULL
+AND last_update BETWEEN '2005-05-25 20:00:00' AND '2005-05-25 24:00:00';
+
+#4
+SELECT title, category.name AS category, rating
+FROM film
+JOIN film_category ON film.film_id = film_category.film_id
+JOIN category ON film_category.category_id = category.category_id
+WHERE special_features LIKE '%Behind the Scenes%';
+
+#5
+SELECT actor.first_name, actor.last_name
+FROM actor
+JOIN film_actor ON actor.actor_id = film_actor.actor_id
+JOIN film ON film.film_id = film_actor.film_id
+WHERE film.title = 'ZOOLANDER FICTION';
+
+#6
+SELECT address, city, country
+FROM store
+JOIN address ON store.address_id = address.address_id
+JOIN city ON address.city_id = city.city_id
+JOIN country ON city.country_id = country.country_id
+WHERE store.store_id = 1;
+
+#7
+SELECT f1.title, f1.rating, f2.title, f2.rating
+FROM film f1, film f2
+WHERE f1.film_id <> f2.film_id
+AND f1.rating = f2.rating
+LIMIT 1;
+
+#8
+SELECT film.title, inventory.inventory_id, CONCAT(staff.first_name, ' ', staff.last_name) AS manager_name
+FROM inventory
+JOIN film ON inventory.film_id = film.film_id
+JOIN store ON inventory.store_id = store.store_id
+JOIN staff ON store.manager_staff_id = staff.staff_id
+WHERE store.store_id = 2 AND inventory.available = 1;
