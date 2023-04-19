@@ -1,0 +1,100 @@
+use sakila;
+
+#1
+SELECT first_name, last_name
+FROM actor a1
+WHERE EXISTS (
+    SELECT 1
+    FROM actor a2
+    WHERE a2.last_name = a1.last_name AND a2.actor_id <> a1.actor_id
+)
+ORDER BY last_name, first_name;
+
+#2
+SELECT a.actor_id, a.first_name, a.last_name
+FROM actor a
+WHERE NOT EXISTS (
+  SELECT *
+  FROM film_actor fa
+  WHERE fa.actor_id = a.actor_id
+);
+
+#3
+SELECT customer_id, first_name, last_name
+FROM customer
+WHERE customer_id IN (
+  SELECT customer_id
+  FROM rental
+  GROUP BY customer_id
+  HAVING COUNT(*) = 1
+);
+
+#4
+SELECT DISTINCT c.customer_id, c.first_name, c.last_name
+FROM customer c
+WHERE EXISTS (
+    SELECT 1
+    FROM rental r1
+    WHERE r1.customer_id = c.customer_id
+) AND EXISTS (
+    SELECT 1
+    FROM rental r2
+    WHERE r2.customer_id = c.customer_id
+    AND r2.rental_id <> (
+        SELECT MIN(r3.rental_id)
+        FROM rental r3
+        WHERE r3.customer_id = c.customer_id
+    )
+);
+
+#5
+SELECT DISTINCT a.actor_id, a.first_name, a.last_name
+FROM actor a
+WHERE a.actor_id IN (
+    SELECT fa.actor_id
+    FROM film f
+    INNER JOIN film_actor fa ON f.film_id = fa.film_id
+    WHERE f.title IN ('BETRAYED REAR', 'CATCH AMISTAD')
+);
+
+#6
+SELECT DISTINCT a.actor_id, a.first_name, a.last_name
+FROM actor a
+INNER JOIN film_actor fa1 ON a.actor_id = fa1.actor_id
+INNER JOIN film f1 ON fa1.film_id = f1.film_id
+WHERE f1.title = 'BETRAYED REAR'
+AND a.actor_id NOT IN (
+    SELECT fa2.actor_id
+    FROM film_actor fa2
+    INNER JOIN film f2 ON fa2.film_id = f2.film_id
+    WHERE f2.title = 'CATCH AMISTAD'
+);
+
+#7
+SELECT DISTINCT a.actor_id, a.first_name, a.last_name
+FROM actor a
+WHERE a.actor_id IN (
+    SELECT fa1.actor_id
+    FROM film_actor fa1
+    INNER JOIN film f1 ON fa1.film_id = f1.film_id
+    WHERE f1.title = 'BETRAYED REAR'
+)
+AND a.actor_id IN (
+    SELECT fa2.actor_id
+    FROM film_actor fa2
+    INNER JOIN film f2 ON fa2.film_id = f2.film_id
+    WHERE f2.title = 'CATCH AMISTAD'
+);
+
+#8
+SELECT actor_id, first_name, last_name
+FROM actor
+WHERE actor_id NOT IN (
+    SELECT actor_id
+    FROM film_actor
+    WHERE film_id IN (
+        SELECT film_id
+        FROM film
+        WHERE title IN ('BETRAYED REAR', 'CATCH AMISTAD')
+    )
+);
